@@ -25,7 +25,6 @@ class TestResponse(unittest.TestCase):
         """ Compare number of scraped abilities to true number of abilities.
         """
         self.maxDiff = None
-        res_abilities = dict()
 
         for hero, num_abilities in self.heroes_abilities.items():
             got_abilities = len(get_abilities(hero))
@@ -33,10 +32,6 @@ class TestResponse(unittest.TestCase):
                 self.assertEqual(num_abilities, got_abilities,
                                  f"{hero.title()} has {num_abilities} "
                                  f"abilities, not {got_abilities}.")
-                res_abilities[hero] = got_abilities
-
-        # Probably unnecessary
-        # self.assertDictEqual(self.heroes_abilities, res_abilities)
 
     def test_get_basic_info(self):
         """ Ensure retured content is the infobox content. """
