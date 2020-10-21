@@ -2,10 +2,11 @@
 This file contains tests for an Overwatch hero data scraper.
 """
 import unittest
-from main import get_abilities
+from main import get_abilities, get_basic_info
+from re import compile
 
 
-class TestAbilitiesResponse(unittest.TestCase):
+class TestResponse(unittest.TestCase):
     """ Ensures every ability is scraped for each hero. """
 
     def setUp(self):
@@ -34,7 +35,18 @@ class TestAbilitiesResponse(unittest.TestCase):
                                  f"abilities, not {got_abilities}.")
                 res_abilities[hero] = got_abilities
 
-        self.assertDictEqual(self.heroes_abilities, res_abilities)
+        # Probably unnecessary
+        # self.assertDictEqual(self.heroes_abilities, res_abilities)
+
+    def test_get_basic_info(self):
+        """ Ensure retured content is the infobox content. """
+        for hero in self.heroes_abilities.keys():
+            got_basic_info = get_basic_info(hero)
+            pattern = compile(r"{{Infobox character")
+
+            with self.subTest(hero=hero):
+                self.assertIsNotNone(pattern.search(got_basic_info),
+                                     f"Wrong information for {hero.title()}")
 
 
 if __name__ == '__main__':
