@@ -53,10 +53,57 @@ def get_basic_info(hero):
     return content[0]
 
 
+def info_to_dict(info):
+    """ Parses information request response into dictionary. """
+
+    # Divide information into iterable list
+    info = info.split("| ")
+
+    # Initialize final return balue
+    info_dict = dict()
+
+    # Define relevant information to return
+    copy_categories = [
+        "name", "realname", "aliases", "age", "nationality",
+        "occuptation", "baseofoperations", "affiliation", "relations"
+        "role", "health", "armor", "shield"
+    ]
+
+    for item in info:
+        # Isolate key-value pairs within information list
+        pattern = compile(r"(.*)=(.*)")
+        matches = pattern.search(item)
+
+        try:
+            key = matches.group(1).strip()
+            value = matches.group(2).strip()
+
+            # Add relevant information to final return value
+            if key in copy_categories:
+                info_dict[key] = value
+        except AttributeError:
+            pass
+
+    return info_dict
+
+
 def main():
     """ Main entry point of the app """
-    test_hero = "genji"
-    print(get_basic_info(test_hero))
+    heroes = [
+        "d.va", "orisa", "reinhardt", "roadhog", "sigma",
+        "winston", "wrecking ball", "zarya",
+        "ashe", "bastion", "doomfist", "echo", "genji",
+        "hanzo", "junkrat", "mccree", "mei", "pharah",
+        "reaper", "soldier: 76", "sombra", "symmetra",
+        "torbjorn", "tracer", "widowmaker",
+        "ana", "baptiste", "brigitte", "lucio", "mercy",
+        "moira", "zenyatta"
+    ]
+
+    for hero in heroes:
+        info = get_basic_info(hero)
+        info_dict = info_to_dict(info)
+        print(info_dict)
 
 
 if __name__ == "__main__":
