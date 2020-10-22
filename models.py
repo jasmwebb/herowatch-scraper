@@ -4,14 +4,14 @@ Contains class models for herowatch.py
 
 import requests
 from bs4 import BeautifulSoup as bs
-from re import compile
+from re import compile, S
 
 
 class Hero:
     """ Model of Overwatch hero """
     def __init__(self, name):
         self.name = name
-        self.details = self.get_details()
+        # self.details = self.get_details()
         self.abilities = self.get_abilities()
 
     # ---- Helper methods START
@@ -26,11 +26,7 @@ class Hero:
         soup = bs(r.content, "html.parser")
 
         # Isolate contents of textarea tag that contains all hero information
-        # Create list of each block of content
-        try:
-            source_content = soup.find("textarea").contents[0].split("\n\n")
-        except AttributeError:
-            pass
+        source_content = soup.find("textarea").contents[0]
 
         return source_content
 
@@ -40,9 +36,11 @@ class Hero:
         # Initialize final return balue
         content_dict = dict()
 
+        print(type(content), "\n", content)
+
         for item in content:
             # Identify key-value pairs within content list
-            pattern = compile(r"([^=]+)={1}(.+)")
+            pattern = compile(r"(?<=\|)(.+)=(.+)")
             matches = pattern.search(item)
 
             try:
@@ -66,7 +64,9 @@ class Hero:
         """
 
         # Isolate then divide information into iterable list
-        content = self.make_request()[0].split("| ")
+        content = self.make_request()
+        pattern = compile(r"(?<={{Infobox character\n)(.+?)\n}}", flags=S)
+        content = pattern.search(content).group(1).split("\n")
 
         # Define relevant information to return
         copy_keys = [
@@ -84,12 +84,11 @@ class Hero:
         content = self.make_request()
 
         # Define pattern that each ability detail block begins with
-        pattern = compile(r"{{Ability[_\s]details")
+        pattern = compile(r"(?<={{Ability_details\n)(.+?)\n}}", flags=S)
 
         # Transform content into a list of only the content that contains
         # ability details
-        content = list(filter(pattern.search, content))
-        content = [ability.split("| ") for ability in content]
+        content = pattern.findall(content)
 
         # Define relevant details to return
         copy_keys = [
