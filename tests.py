@@ -38,13 +38,14 @@ class TestResponse(unittest.TestCase):
         """ Compare keys of scraped details to keys of universal/required
         details.
         """
+        universal_details_keys = {
+            "name", "age", "occupation", "baseofoperations",
+            "affiliation", "role", "health"
+        }
+
         for hero in self.heroes_abilities.keys():
             test_hero = Hero(hero)
             test_details_keys = test_hero.details.keys()
-            universal_details_keys = {
-                "name", "age", "occupation", "baseofoperations",
-                "affiliation", "role", "health"
-            }
 
             with self.subTest(hero=hero):
                 self.assertTrue(universal_details_keys

@@ -8,6 +8,7 @@ __version__ = "0.1.0"
 __license__ = "MIT"
 
 from models import Hero
+# from pprint import PrettyPrinter
 
 
 def main():
@@ -22,9 +23,6 @@ def main():
         "ana", "baptiste", "brigitte", "lucio", "mercy",
         "moira", "zenyatta"
     ]
-
-    test = Hero("sigma")
-    print(test.details)
 
 
 if __name__ == "__main__":

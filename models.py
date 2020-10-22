@@ -11,7 +11,7 @@ class Hero:
     """ Model of Overwatch hero """
     def __init__(self, name):
         self.name = name
-        # self.details = self.get_details()
+        self.details = self.get_details()
         self.abilities = self.get_abilities()
 
     # ---- Helper methods START
@@ -31,16 +31,16 @@ class Hero:
         return source_content
 
     def to_dict(self, content, copy_keys):
-        """ Parses scraped content and returns a dictionary. """
+        """ Parses list of scraped content and returns a dictionary. """
 
         # Initialize final return balue
         content_dict = dict()
 
-        print(type(content), "\n", content)
-
         for item in content:
+            item = item.lstrip("|")
+
             # Identify key-value pairs within content list
-            pattern = compile(r"(?<=\|)(.+)=(.+)")
+            pattern = compile(r"(.+)=(.+)", flags=S)
             matches = pattern.search(item)
 
             try:
@@ -84,6 +84,7 @@ class Hero:
         content = self.make_request()
 
         # Define pattern that each ability detail block begins with
+        # pattern = compile(r"(?<={{Ability_details\n)(.+?)\n}}", flags=S)
         pattern = compile(r"(?<={{Ability_details\n)(.+?)\n}}", flags=S)
 
         # Transform content into a list of only the content that contains
@@ -100,4 +101,19 @@ class Hero:
             "ult_gain", "ult_req"
         ]
 
-        return [self.to_dict(ability, copy_keys) for ability in content]
+        # Transform each ability into a list of unseparated key, value pairs
+        content = (ability.split("\n|") for ability in content)
+
+        # Transform into list of dictionaries
+        dict_content = [
+            self.to_dict(ability, copy_keys) for ability in content
+        ]
+
+        # Transform string value of ability_details into a list of strings
+        for ability in dict_content:
+            if "ability_details" in ability:
+                ability["ability_details"] = (
+                    list(filter(None, ability["ability_details"].split("* ")))
+                )
+
+        return dict_content
