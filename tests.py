@@ -2,8 +2,7 @@
 This file contains tests for an Overwatch hero data scraper.
 """
 import unittest
-from main import get_abilities, get_basic_info
-from re import compile
+from models import Hero
 
 
 class TestResponse(unittest.TestCase):
@@ -27,21 +26,31 @@ class TestResponse(unittest.TestCase):
         self.maxDiff = None
 
         for hero, num_abilities in self.heroes_abilities.items():
-            got_abilities = len(get_abilities(hero))
-            with self.subTest(num_abilities=num_abilities):
-                self.assertEqual(num_abilities, got_abilities,
-                                 f"{hero.title()} has {num_abilities} "
-                                 f"abilities, not {got_abilities}.")
+            test_hero = Hero(hero)
+            test_num_abilities = len(test_hero.abilities)
 
-    def test_get_basic_info(self):
-        """ Ensure retured content is the infobox content. """
+            with self.subTest(num_abilities=num_abilities):
+                self.assertEqual(num_abilities, test_num_abilities,
+                                 f"{hero.title()} has {num_abilities} "
+                                 f"abilities, not {test_num_abilities}.")
+
+    def test_get_details(self):
+        """ Compare keys of scraped details to keys of universal/required
+        details.
+        """
         for hero in self.heroes_abilities.keys():
-            got_basic_info = get_basic_info(hero)
-            pattern = compile(r"{{Infobox character")
+            test_hero = Hero(hero)
+            test_details_keys = test_hero.details.keys()
+            universal_details_keys = {
+                "name", "age", "occupation", "baseofoperations",
+                "affiliation", "role", "health"
+            }
 
             with self.subTest(hero=hero):
-                self.assertIsNotNone(pattern.search(got_basic_info),
-                                     f"Wrong information for {hero.title()}")
+                self.assertTrue(universal_details_keys
+                                .issubset(test_details_keys),
+                                f"Missing required details for {hero.title()}:"
+                                f"{universal_details_keys.difference(test_details_keys)}")
 
 
 if __name__ == '__main__':
