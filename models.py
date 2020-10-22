@@ -40,7 +40,7 @@ class Hero:
             item = item.lstrip("|")
 
             # Identify key-value pairs within content list
-            pattern = compile(r"(.+)=(.+)", flags=S)
+            pattern = compile(r"([^=]+)=(.+)", flags=S)
             matches = pattern.search(item)
 
             try:
@@ -65,8 +65,16 @@ class Hero:
 
         # Isolate then divide information into iterable list
         content = self.make_request()
-        pattern = compile(r"(?<={{Infobox character\n)(.+?)\n}}", flags=S)
-        content = pattern.search(content).group(1).split("\n")
+        pattern = compile(
+            r"(?<={{Infobox character\n)(.+?)\n*}}\n(?='''|\[\[)",
+            flags=S
+        )
+
+        try:
+            content = pattern.search(content).group(1).split("\n")
+        # Ignore non-matches (None)
+        except AttributeError:
+            pass
 
         # Define relevant information to return
         copy_keys = [
@@ -84,8 +92,10 @@ class Hero:
         content = self.make_request()
 
         # Define pattern that each ability detail block begins with
-        # pattern = compile(r"(?<={{Ability_details\n)(.+?)\n}}", flags=S)
-        pattern = compile(r"(?<={{Ability_details\n)(.+?)\n}}", flags=S)
+        pattern = compile(
+            r"(?<={{Ability_details\n|{{Ability details\s)(.+?)\n}}",
+            flags=S
+        )
 
         # Transform content into a list of only the content that contains
         # ability details
@@ -102,7 +112,11 @@ class Hero:
         ]
 
         # Transform each ability into a list of unseparated key, value pairs
-        content = (ability.split("\n|") for ability in content)
+        try:
+            content = (ability.split("\n|") for ability in content)
+        # Ignore non-matches (None)
+        except AttributeError:
+            pass
 
         # Transform into list of dictionaries
         dict_content = [

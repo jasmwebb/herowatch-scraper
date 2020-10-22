@@ -20,7 +20,7 @@ class TestResponse(unittest.TestCase):
             "moira": 5, "zenyatta": 5
         }
 
-    def test_get_abilites(self):
+    def test_get_abilities(self):
         """ Compare number of scraped abilities to true number of abilities.
         """
         self.maxDiff = None
@@ -50,8 +50,12 @@ class TestResponse(unittest.TestCase):
             with self.subTest(hero=hero):
                 self.assertTrue(universal_details_keys
                                 .issubset(test_details_keys),
-                                f"Missing required details for {hero.title()}:"
-                                f"{universal_details_keys.difference(test_details_keys)}")
+                                "Missing required details for {0}: {1}"
+                                .format(hero.title(),
+                                        universal_details_keys
+                                        .difference(test_details_keys)
+                                        )
+                                )
 
 
 if __name__ == '__main__':
