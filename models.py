@@ -4,7 +4,7 @@ Contains class models for herowatch.py
 
 import requests
 from bs4 import BeautifulSoup as bs
-from re import compile, S
+from re import compile, S, sub
 
 
 class Hero:
@@ -56,6 +56,27 @@ class Hero:
                 pass
 
         return content_dict
+
+    def sanitize_values(self, content):
+        """ Removes extraneous characters from values of given dictionary. """
+        content_copy = content
+
+        code_chars = compile(
+            r"<ref\sname\s=\s\".*\"\/*>|"
+            r"{{.+}}\s*|"
+            r"\[\[\w+\s*\(*\w*\)*\||"
+            r"[\[\]]|"
+            r"\d*-\d*-\d*,|"
+            r"https:\/\/.*"
+        )
+        line_breaks = compile(r"<br\/*>")
+
+        for key, value in content_copy.items():
+            value = sub(code_chars, "", value)
+            value = sub(line_breaks, ", ", value)
+            content_copy[key] = value
+
+        return content_copy
     # Helper methods END ----
 
     def get_details(self):
@@ -71,7 +92,7 @@ class Hero:
         )
 
         try:
-            content = pattern.search(content).group(1).split("\n")
+            content = pattern.search(content).group(1).split("\n|")
         # Ignore non-matches (None)
         except AttributeError:
             pass
@@ -83,7 +104,7 @@ class Hero:
             "role", "health", "armor", "shield"
         ]
 
-        return self.to_dict(content, copy_keys)
+        return self.sanitize_values(self.to_dict(content, copy_keys))
 
     def get_abilities(self):
         """ Scrapes and parses ability data for a single hero from the
