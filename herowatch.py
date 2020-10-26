@@ -14,9 +14,10 @@ from models import Hero
 
 def generate_hero(heroes):
     """ Generates hero data while iterating through give hero list. """
-    for hero in heroes:
+    total_heroes = len(heroes)
+    for i, hero in enumerate(heroes):
         hero = Hero(hero)
-        print(f"----- {hero.name} data gathered ".ljust(80, "-"))
+        print(f"{i + 1} of {total_heroes} - {hero.name} data gathered")
         yield (
             hero.name,
             {
@@ -47,7 +48,7 @@ def main():
         )
 
     print("** Hero data written to heroes.json"
-          "\n** Manually search for and edit instances of {{# to finish.")
+          "\n** Manually search for and edit instances of \"{{#\" to finish")
 
 
 if __name__ == "__main__":
