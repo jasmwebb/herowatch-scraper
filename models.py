@@ -63,17 +63,20 @@ class Hero:
 
         code_chars = compile(
             r"<ref\sname\s=\s\".*\"\/*>|"
-            r"{{.+}}\s*|"
-            r"\[\[\w+\s*\(*\w*\)*\||"
+            r"{{.+?\||}}|"
+            r"\[\[.+\||\]\]|"
             r"[\[\]]|"
             r"\d*-\d*-\d*,|"
-            r"https:\/\/.*"
+            r"https:\/\/.*|"
+            r"<!--.+-->|"
+            r"\n"
         )
         line_breaks = compile(r"<br\/*>")
 
         for key, value in content_copy.items():
             value = sub(code_chars, "", value)
             value = sub(line_breaks, ", ", value)
+            value = value.replace("|", " ")
             content_copy[key] = value
 
         return content_copy
@@ -83,6 +86,7 @@ class Hero:
         """ Scrapes and parses general information for a single hero from the
         Overwatch wiki. Returns information as a dictionary.
         """
+        print("Gathering hero details...")
 
         # Isolate then divide information into iterable list
         content = self.make_request()
@@ -110,6 +114,7 @@ class Hero:
         """ Scrapes and parses ability data for a single hero from the
         Overwatch wiki. Returns information as a list of dictionaries.
         """
+        print("Gathering hero abilities...")
         content = self.make_request()
 
         # Define pattern that each ability detail block begins with
@@ -141,7 +146,9 @@ class Hero:
 
         # Transform into list of dictionaries
         dict_content = [
-            self.to_dict(ability, copy_keys) for ability in content
+            self.sanitize_values(
+                self.to_dict(ability, copy_keys)
+            ) for ability in content
         ]
 
         # Transform string value of ability_details into a list of strings

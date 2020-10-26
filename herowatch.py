@@ -16,6 +16,7 @@ def generate_hero(heroes):
     """ Generates hero data while iterating through give hero list. """
     for hero in heroes:
         hero = Hero(hero)
+        print(f"----- {hero.name} data gathered ".ljust(80, "-"))
         yield (
             hero.name,
             {
@@ -44,6 +45,9 @@ def main():
             {k: v for (k, v) in generate_hero(heroes)},
             heroes_json
         )
+
+    print("** Hero data written to heroes.json"
+          "\n** Manually search for and edit instances of {{# to finish.")
 
 
 if __name__ == "__main__":
