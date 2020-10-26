@@ -86,7 +86,6 @@ class Hero:
         """ Scrapes and parses general information for a single hero from the
         Overwatch wiki. Returns information as a dictionary.
         """
-        print("Gathering hero details...")
 
         # Isolate then divide information into iterable list
         content = self.make_request()
@@ -114,7 +113,6 @@ class Hero:
         """ Scrapes and parses ability data for a single hero from the
         Overwatch wiki. Returns information as a list of dictionaries.
         """
-        print("Gathering hero abilities...")
         content = self.make_request()
 
         # Define pattern that each ability detail block begins with
