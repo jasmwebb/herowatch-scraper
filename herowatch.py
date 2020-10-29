@@ -19,7 +19,7 @@ def generate_hero(heroes):
         hero = Hero(hero)
         print(f"{i + 1} of {total_heroes} - {hero.name} data gathered")
         yield (
-            hero.name,
+            hero.name.lower(),
             {
                 "details": hero.details,
                 "abilities": hero.abilities
