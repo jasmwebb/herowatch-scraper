@@ -62,7 +62,8 @@ class Hero:
         content_copy = content
 
         code_chars = compile(
-            r"<ref\sname\s=\s\".*\"\/*>|"
+            r"<ref\sname\s*=\s*\\*\".+\"\/*>|"
+            r"<\/ref>|"
             r"{{.+?\||}}|"
             r"\[\[.+\||\]\]|"
             r"[\[\]]|"
