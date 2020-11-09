@@ -13,7 +13,10 @@ from models import Hero
 
 
 def generate_hero(heroes):
-    """ Generates hero data while iterating through give hero list. """
+    """Generates hero data while iterating through given hero list.
+    Yields a tuple containing the hero's name and a dictionary containing
+    their information.
+    """
     total_heroes = len(heroes)
     for i, hero in enumerate(heroes):
         hero = Hero(hero)
@@ -28,7 +31,7 @@ def generate_hero(heroes):
 
 
 def main():
-    """ Main entry point of the app """
+    """Main entry point of the app"""
     heroes = [
         "d.va", "orisa", "reinhardt", "roadhog", "sigma",
         "winston", "wrecking ball", "zarya",
@@ -52,5 +55,5 @@ def main():
 
 
 if __name__ == "__main__":
-    """ This is executed when run from the command line """
+    """This is executed when run from the command line"""
     main()

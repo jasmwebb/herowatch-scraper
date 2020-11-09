@@ -8,15 +8,16 @@ from re import compile, S, sub
 
 
 class Hero:
-    """ Model of Overwatch hero """
+    """Model of Overwatch hero"""
     def __init__(self, name):
         self.name = name
+        self.raw_request = self.make_request()
         self.details = self.get_details()
         self.abilities = self.get_abilities()
 
     # ---- Helper methods START
     def make_request(self):
-        """ Makes a request to the Overwatch wiki for specified hero's page """
+        """Makes a request to the Overwatch wiki for specified hero's page."""
 
         # Sanitize hero name for URL
         self.name = self.name.title().replace(" ", "_")
@@ -31,9 +32,9 @@ class Hero:
         return source_content
 
     def to_dict(self, content, copy_keys):
-        """ Parses list of scraped content and returns a dictionary. """
+        """Parses list of scraped content and returns as a dictionary."""
 
-        # Initialize final return balue
+        # Initialize final return value
         content_dict = dict()
 
         for item in content:
@@ -50,15 +51,14 @@ class Hero:
                 # Add relevant information to final return value
                 if key in copy_keys:
                     content_dict[key] = value
-
-            # Ignore non-matches (None)
             except AttributeError:
+                # Ignore non-matches (None)
                 pass
 
         return content_dict
 
     def sanitize_values(self, content):
-        """ Removes extraneous characters from values of given dictionary. """
+        """Removes extraneous characters from values of given dictionary."""
         content_copy = content
 
         code_chars = compile(
@@ -84,21 +84,22 @@ class Hero:
     # Helper methods END ----
 
     def get_details(self):
-        """ Scrapes and parses general information for a single hero from the
+        """Scrapes and parses general information for a single hero from the
         Overwatch wiki. Returns information as a dictionary.
         """
 
-        # Isolate then divide information into iterable list
-        content = self.make_request()
+        # Isolate information
+        content = self.raw_request
         pattern = compile(
             r"(?<={{Infobox character\n)(.+?)\n*}}\n(?='''|\[\[)",
             flags=S
         )
 
         try:
+            # Transform information into iterable list
             content = pattern.search(content).group(1).split("\n|")
-        # Ignore non-matches (None)
         except AttributeError:
+            # Ignore non-matches (None)
             pass
 
         # Define relevant information to return
@@ -111,10 +112,11 @@ class Hero:
         return self.sanitize_values(self.to_dict(content, copy_keys))
 
     def get_abilities(self):
-        """ Scrapes and parses ability data for a single hero from the
+        """Scrapes and parses ability data for a single hero from the
         Overwatch wiki. Returns information as a list of dictionaries.
+        One dictionary per ability.
         """
-        content = self.make_request()
+        content = self.raw_request
 
         # Define pattern that each ability detail block begins with
         pattern = compile(
@@ -136,11 +138,11 @@ class Hero:
             "ult_gain", "ult_req"
         ]
 
-        # Transform each ability into a list of unseparated key, value pairs
         try:
+            # Transform each ability into a list of its stats
             content = (ability.split("\n|") for ability in content)
-        # Ignore non-matches (None)
         except AttributeError:
+            # Ignore non-matches (None)
             pass
 
         # Transform into list of dictionaries
